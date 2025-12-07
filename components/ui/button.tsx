@@ -13,11 +13,11 @@ export type ButtonVariant =
   | "destructive";
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    MotionProps {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   asChild?: boolean;
   variant?: ButtonVariant;
   size?: "xs" | "sm" | "md" | "lg" | "icon";
+  // Motion props are handled separately via motionProps object
 }
 
 const baseClasses =

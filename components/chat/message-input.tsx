@@ -31,11 +31,21 @@ export function MessageInput({ onSend }: MessageInputProps) {
     // Send over socket with authenticated user identity
     const socket = getSocketClient();
     if (socket && user) {
-      socket.emit("admin message sent", {
-        senderId: user.id, // Use actual logged-in user ID
-        receiverId: TARGET_USER_ID, // Always send to user 27
-        message: trimmed,
-      });
+
+
+
+       socket.emit('admin message sent', {
+                    senderId: 2,
+                    receiverId: 27,
+                    message: trimmed
+                });
+
+      // socket.emit("admin message sent", {
+      //   senderId: user?.id, 
+      //   receiverId: TARGET_USER_ID,
+      //   message: trimmed,
+      // });
+      console.log("message sent to -------------socket", user?.id, TARGET_USER_ID);
     }
 
     onSend?.(trimmed);

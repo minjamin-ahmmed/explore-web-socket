@@ -150,8 +150,15 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       payload: { senderId: string; message: string },
       idPrefix: string
     ) => {
-      // Only show messages from user 27 (the target user we're chatting with)
-      if (payload.senderId !== TARGET_USER_ID && payload.senderId !== me.id) {
+      console.log("📝 appendMessage called with:", payload, "prefix:", idPrefix);
+      
+      // Only show messages from user 27 (the target user we're chatting with) or from ourselves
+      const senderIdStr = String(payload.senderId);
+      const targetIdStr = String(TARGET_USER_ID);
+      const myIdStr = String(me.id);
+      
+      if (senderIdStr !== targetIdStr && senderIdStr !== myIdStr) {
+        console.log("⚠️ Message filtered out - senderId:", senderIdStr, "not matching target or me");
         return;
       }
 
@@ -159,13 +166,19 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       const incoming: ChatMessage = {
         id: `${idPrefix}-${Date.now()}`,
         conversationId: activeConversationId,
-        senderId: payload.senderId,
+        senderId: senderIdStr,
         content: payload.message,
         createdAt,
         status: "delivered",
       };
 
-      setMessages((prev) => [...prev, incoming]);
+      console.log("💬 Adding message to state:", incoming);
+      
+      setMessages((prev) => {
+        const updated = [...prev, incoming];
+        console.log("📊 Total messages in state:", updated.length);
+        return updated;
+      });
 
       // Update conversation metadata
       setConversations((prev) =>
@@ -176,7 +189,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
                 lastMessagePreview: payload.message,
                 lastMessageAt: createdAt,
                 unreadCount:
-                  payload.senderId === TARGET_USER_ID
+                  senderIdStr === targetIdStr
                     ? conv.unreadCount + 1
                     : conv.unreadCount,
               }
@@ -186,20 +199,43 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     };
 
     const handleAdminMessageReceive = (payload: AdminPayload) => {
+      console.log("📨 Message received from socket:", payload);
+      
+      // Normalize senderId to string for comparison (handle both string and number)
+      const senderIdStr = String(payload.senderId);
+      const targetIdStr = String(TARGET_USER_ID);
+      
+      console.log("🔍 Checking senderId:", senderIdStr, "against target:", targetIdStr);
+      
       // Only show messages from user 27
-      if (payload.senderId === TARGET_USER_ID) {
-        appendMessage(payload, "remote");
+      if (senderIdStr === targetIdStr) {
+        console.log("✅ Message matches target user, adding to UI...");
+        appendMessage(
+          { senderId: senderIdStr, message: payload.message },
+          "remote"
+        );
+      } else {
+        console.log("❌ Message ignored - senderId doesn't match target user");
       }
     };
 
     const handleAdminMessageSent = (payload: AdminSentPayload) => {
+      // Normalize IDs to strings for comparison
+      const senderIdStr = String(payload.senderId);
+      const receiverIdStr = String(payload.receiverId);
+      const targetIdStr = String(TARGET_USER_ID);
+      const myIdStr = String(me.id);
+      
       // Only append if this client is the intended receiver (admin) and sender is user 27
       // OR if we sent it and it's being echoed back
       if (
-        (payload.receiverId === me.id && payload.senderId === TARGET_USER_ID) ||
-        (payload.senderId === me.id && payload.receiverId === TARGET_USER_ID)
+        (receiverIdStr === myIdStr && senderIdStr === targetIdStr) ||
+        (senderIdStr === myIdStr && receiverIdStr === targetIdStr)
       ) {
-        appendMessage(payload, "admin");
+        appendMessage(
+          { senderId: senderIdStr, message: payload.message },
+          "admin"
+        );
       }
     };
 

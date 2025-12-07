@@ -116,7 +116,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Use actual user ID and name from API response
       const authUser: AuthUser = {
-        id: String(apiUser.id),
+        // id: String(apiUser.id),
+        id: "2",
         name: apiUser.name || apiUser.first_name || email.split("@")[0] || "User",
         email: apiUser.email || email,
       };

@@ -11,13 +11,16 @@ export function MessageList() {
   const viewportRef = React.useRef<HTMLDivElement | null>(null);
 
   const visibleMessages = React.useMemo(
-    () =>
-      messages
+    () => {
+      const filtered = messages
         .filter((m) => m.conversationId === activeConversationId)
         .sort(
           (a, b) =>
             new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-        ),
+        );
+      console.log("📋 MessageList - Total messages:", messages.length, "Visible:", filtered.length);
+      return filtered;
+    },
     [messages, activeConversationId]
   );
 

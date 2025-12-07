@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "@/components/theme/mode-toggle";
+import { ConnectionIndicator } from "@/components/chat/connection-indicator";
 import { cn } from "@/lib/utils";
 
 export function ChatHeader() {
@@ -53,6 +54,7 @@ export function ChatHeader() {
         </div>
       </div>
       <div className="flex items-center gap-1.5">
+        <ConnectionIndicator />
         <Button
           variant="ghost"
           size="sm"
@@ -64,27 +66,7 @@ export function ChatHeader() {
         >
           Logout
         </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <span className="sr-only">Open conversation menu</span>
-              <span className="text-lg leading-none text-muted-foreground">
-                ···
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem className={cn("text-xs")}>
-              View details
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-xs">
-              Mute notifications
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-xs text-destructive">
-              Leave channel
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+   
         <ModeToggle />
       </div>
     </header>
